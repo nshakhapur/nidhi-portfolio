@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nidhi Shakhapur — Research Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
+<style>
+:root{
+  --neon:#22d3ee;--purple:#a855f7;--green:#10b981;--amber:#f59e0b;
+  --dark:#02020a;--dark2:#06061a;--dark3:#0c0c1e;
+  --glass:rgba(4,4,22,.78);--gb:rgba(34,211,238,.12);--gb2:rgba(168,85,247,.12);
+  --ink:#e8e8f0;--ink2:rgba(255,255,255,.55);--ink3:rgba(255,255,255,.28);
+  --border:rgba(34,211,238,.11);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden}
+#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+.scanlines{position:fixed;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.032) 2px,rgba(0,0,0,.032) 4px)}
+main{position:relative;z-index:3}
+
+/* cursor glow */
+#cg{position:fixed;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,.038) 0%,transparent 70%);pointer-events:none;z-index:1;transform:translate(-50%,-50%);left:-999px;top:-999px}
+
+/* ── Loader ── */
+#loader{position:fixed;inset:0;z-index:9999;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:22px}
+.ld-logo{font-family:'Orbitron',monospace;font-size:clamp(28px,5vw,54px);font-weight:900;letter-spacing:.14em;color:var(--neon);text-shadow:0 0 40px rgba(34,211,238,.55)}
+.ld-sub{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.22em;color:var(--ink3);text-transform:uppercase;margin-top:-8px}
+.ld-bar{width:300px;height:1.5px;background:rgba(34,211,238,.12);border-radius:2px;overflow:hidden}
+#ld-fill{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--neon));transition:width .05s linear}
+.ld-status{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.16em;color:rgba(34,211,238,.45);text-transform:uppercase}
+
+/* ── Top bar ── */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;padding:0 48px;justify-content:space-between;background:rgba(2,2,12,.72);backdrop-filter:blur(22px);border-bottom:1px solid rgba(34,211,238,.06);transition:border-color .3s}
+#topbar.scrolled{border-color:rgba(34,211,238,.14)}
+.tb-brand{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--ink);text-decoration:none}
+.tb-brand span{color:var(--neon)}
+.tb-right{display:flex;gap:20px;align-items:center}
+.tb-link{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--ink3);text-decoration:none;text-transform:uppercase;transition:color .2s}
+.tb-link:hover{color:var(--neon)}
+
+/* ── Right dot nav ── */
+#sidenav{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;gap:6px;align-items:center}
+.sn-dot{width:7px;height:7px;border-radius:50%;border:1px solid rgba(34,211,238,.26);cursor:pointer;transition:all .25s;position:relative;display:block;text-decoration:none}
+.sn-dot.active{background:var(--neon);border-color:var(--neon);box-shadow:0 0 10px rgba(34,211,238,.5);transform:scale(1.35)}
+.sn-dot:hover{border-color:var(--neon)}
+.sn-dot::before{content:attr(data-label);position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--neon);opacity:0;text-transform:uppercase;transition:opacity .2s;pointer-events:none;background:rgba(2,2,12,.88);padding:3px 8px;border-radius:4px}
+.sn-dot:hover::before{opacity:1}
+.sn-line{width:1px;height:10px;background:rgba(34,211,238,.1)}
+@media(max-width:768px){#sidenav{display:none}}
+
+/* ── Hero ── */
+#s-hero{min-height:100vh;display:flex;align-items:center;padding:56px 80px 60px;position:relative}
+@media(max-width:768px){#s-hero{padding:80px 24px 60px}}
+.hero-inner{max-width:1280px;margin:0 auto;width:100%}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--neon);text-transform:uppercase;margin-bottom:32px}
+.hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--neon);animation:blink 2.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hero-headline{font-family:'Orbitron',monospace;font-size:clamp(42px,6.5vw,88px);font-weight:900;line-height:1.04;letter-spacing:-.02em;color:var(--ink);margin-bottom:28px}
+.hero-headline em{font-style:normal;color:var(--neon)}
+.hero-sub{font-size:16px;line-height:1.8;color:var(--ink2);max-width:560px;margin-bottom:52px}
+.hero-chips{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:60px}
+.hero-chip{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;padding:9px 18px;border:1px solid var(--border);border-radius:20px;color:var(--ink3);text-transform:uppercase;transition:border-color .2s,color .2s}
+.hero-chip:hover{border-color:rgba(34,211,238,.4);color:var(--neon)}
+.hero-chip.accent{border-color:var(--gb);color:var(--neon)}
+.hero-scroll{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--ink3);text-transform:uppercase;display:flex;align-items:center;gap:12px;animation:scrollPulse 2.4s ease-in-out infinite}
+.hero-scroll::before{content:'';width:1px;height:32px;background:linear-gradient(to bottom,transparent,var(--neon));display:block}
+@keyframes scrollPulse{0%,100%{opacity:.5;transform:translateY(0)}50%{opacity:1;transform:translateY(4px)}}
+
+/* ── Project sections ── */
+.proj-sec{min-height:100vh;display:flex;align-items:center;padding:80px;position:relative;border-top:1px solid var(--border)}
+@media(max-width:768px){.proj-sec{padding:80px 24px}}
+.proj-bg-num{position:absolute;top:50%;left:60px;transform:translateY(-50%);font-family:'Orbitron',monospace;font-size:clamp(120px,18vw,240px);font-weight:900;color:var(--neon);opacity:.022;line-height:1;pointer-events:none;user-select:none;letter-spacing:-.04em}
+.proj-inner{max-width:1280px;margin:0 auto;width:100%;position:relative;z-index:1}
+.proj-toprow{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.proj-num{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.22em;color:var(--purple);text-transform:uppercase}
+.proj-meta-right{text-align:right}
+.proj-period{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--neon);display:block}
+.proj-venue{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--ink3);display:block;margin-top:3px}
+.proj-status{display:inline-flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.1em;padding:4px 10px;border-radius:12px;margin-top:5px;text-transform:uppercase}
+.proj-status.ongoing{background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.2);color:var(--neon)}
+.proj-status.done{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--ink3)}
+.proj-status.patent{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--amber)}
+.proj-status.award{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--green)}
+.proj-status::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.proj-status.ongoing::before{animation:blink 2s infinite}
+
+.proj-headline{font-family:'Orbitron',monospace;font-size:clamp(26px,3.8vw,52px);font-weight:700;line-height:1.1;color:var(--ink);margin-bottom:40px;letter-spacing:-.01em;max-width:700px}
+
+.proj-split{display:grid;grid-template-columns:1fr 1.15fr;gap:64px;align-items:start}
+@media(max-width:900px){.proj-split{grid-template-columns:1fr;gap:40px}}
+
+/* left: overview */
+.proj-overview-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.18em;color:var(--ink3);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.proj-overview-text{font-size:14px;line-height:1.85;color:var(--ink2);margin-bottom:28px}
+
+/* stat chips row */
+.proj-stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.pstat{background:var(--glass);border:1px solid var(--border);backdrop-filter:blur(10px);border-radius:10px;padding:12px 16px;min-width:90px}
+.pstat-n{font-family:'Orbitron',monospace;font-size:18px;font-weight:700;color:var(--neon);line-height:1}
+.pstat-n.pu{color:var(--purple)}
+.pstat-n.gr{color:var(--green)}
+.pstat-l{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-top:4px}
+
+/* tool tags */
+.proj-tools{display:flex;flex-wrap:wrap;gap:7px}
+.ptool{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.08em;padding:4px 10px;border-radius:4px;border:1px solid var(--border);color:var(--ink3);text-transform:uppercase;transition:border-color .2s,color .2s}
+.ptool:hover{border-color:rgba(34,211,238,.3);color:var(--neon)}
+.ptool.hl{border-color:rgba(34,211,238,.25);color:var(--neon);background:rgba(34,211,238,.05)}
+
+/* right: contributions */
+.proj-contrib-wrap{background:rgba(2,3,10,.7);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.pc-header{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:rgba(34,211,238,.03)}
+.pc-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.18em;color:var(--neon);text-transform:uppercase}
+.pc-count{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--ink3)}
+.pc-list{padding:8px 0}
+.ci{display:flex;gap:0;padding:0;border-bottom:1px solid rgba(34,211,238,.05);transition:background .2s;position:relative;overflow:hidden}
+.ci:last-child{border-bottom:none}
+.ci:hover{background:rgba(34,211,238,.025)}
+.ci::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(34,211,238,.04),transparent);transition:none}
+.ci:hover::after{left:150%;transition:left .55s ease}
+.ci-mark{font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--neon);opacity:.55;flex-shrink:0;padding:18px 0 18px 22px;line-height:1}
+.ci-body{padding:16px 22px 16px 14px;flex:1}
+.ci-head{font-size:13px;font-weight:600;color:var(--ink);line-height:1.4;margin-bottom:5px}
+.ci-sub{font-family:'Share Tech Mono',monospace;font-size:11px;line-height:1.65;color:var(--ink3)}
+
+/* outcome banner */
+.proj-outcome{display:flex;align-items:center;gap:12px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.18);border-radius:8px;padding:12px 18px;margin-top:20px}
+.proj-outcome.patent{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.18)}
+.po-icon{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.12em;color:var(--green);text-transform:uppercase;flex-shrink:0}
+.proj-outcome.patent .po-icon{color:var(--amber)}
+.po-text{font-size:13px;color:var(--ink2);line-height:1.5}
+
+/* divider strip between sections */
+.sec-divider{position:relative;z-index:3;border:none;border-top:1px solid var(--border);margin:0 80px}
+@media(max-width:768px){.sec-divider{margin:0 24px}}
+
+/* ── Reveal ── */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .65s ease,transform .65s ease}
+.reveal.in{opacity:1;transform:none}
+.reveal-l{opacity:0;transform:translateX(-26px);transition:opacity .65s ease,transform .65s ease}
+.reveal-l.in{opacity:1;transform:none}
+.reveal-r{opacity:0;transform:translateX(26px);transition:opacity .65s ease,transform .65s ease}
+.reveal-r.in{opacity:1;transform:none}
+
+/* ── Project Viz ── */
+.proj-viz-wrap{margin:0 0 40px;position:relative;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:rgba(2,3,10,.68);height:152px}
+.pviz-label{position:absolute;top:10px;left:16px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.15em;color:rgba(34,211,238,.25);text-transform:uppercase;z-index:2;pointer-events:none}
+.pviz-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity 1s ease}
+.pviz-canvas.in{opacity:1}
+
+/* ── Footer ── */
+footer{border-top:1px solid var(--border);padding:40px 80px;text-align:center;position:relative;z-index:3;background:rgba(2,2,10,.7)}
+footer p{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--ink3);line-height:2;letter-spacing:.08em}
+footer a{color:var(--neon);text-decoration:none}
+footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="scanlines"></div>
+<div id="cg"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="ld-logo">NS</div>
+  <div class="ld-sub">Research Projects</div>
+  <div class="ld-bar"><div id="ld-fill"></div></div>
+  <div class="ld-status" id="ld-status">LOADING SEQUENCE DATA...</div>
+</div>
+
+<!-- Top bar -->
+<header id="topbar">
+  <a class="tb-brand" href="index.html">Nidhi <span>Shakhapur</span></a>
+  <div class="tb-right">
+    <a href="index.html" class="tb-link">← Portfolio</a>
+    <a href="mailto:nshakhapur@gmail.com" class="tb-link">Contact</a>
+  </div>
+</header>
+
+<!-- Right dot nav -->
+<nav id="sidenav">
+  <a class="sn-dot active" data-label="Overview" href="#s-hero"></a>
+  <div class="sn-line"></div>
+  <a class="sn-dot" data-label="Neuroblastoma" href="#s-01"></a>
+  <div class="sn-line"></div>
+  <a class="sn-dot" data-label="Geno–Phenotype" href="#s-02"></a>
+  <div class="sn-line"></div>
+  <a class="sn-dot" data-label="Microglia" href="#s-03"></a>
+  <div class="sn-line"></div>
+  <a class="sn-dot" data-label="ISRO Telemetry" href="#s-04"></a>
+  <div class="sn-line"></div>
+  <a class="sn-dot" data-label="Migraine Patent" href="#s-05"></a>
+  <div class="sn-line"></div>
+  <a class="sn-dot" data-label="Space Cargo" href="#s-06"></a>
+</nav>
+
+<main>
+
+<!-- ══ HERO ══ -->
+<section id="s-hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Nidhi Shakhapur · Research Deep Dives</div>
+    <h1 class="hero-headline">Six Projects.<br>Every <em>Contribution</em>.<br>In Detail.</h1>
+    <p class="hero-sub">An in-depth look at the research I've contributed to — from annotating 107,461 tumour cells to detecting satellite anomalies for ISRO. Each section breaks down what I built, what I found, and how.</p>
+    <div class="hero-chips">
+      <span class="hero-chip accent">6 Projects</span>
+      <span class="hero-chip accent">3 Institutions</span>
+      <span class="hero-chip">1 Patent Filed</span>
+      <span class="hero-chip">4 Publications</span>
+      <span class="hero-chip">3+ Years Research</span>
+    </div>
+    <div class="hero-scroll">Scroll to explore</div>
+  </div>
+</section>
+
+<!-- ══ PROJECT 01 — NEUROBLASTOMA ══ -->
+<section id="s-01" class="proj-sec">
+  <div class="proj-bg-num">01</div>
+  <div class="proj-inner">
+    <div class="proj-toprow reveal">
+      <div>
+        <div class="proj-num">01 · Spatial Transcriptomics</div>
+      </div>
+      <div class="proj-meta-right">
+        <span class="proj-period">Sep 2025 – Present</span>
+        <span class="proj-venue">Imperial College London · KCL Collaboration</span>
+        <span class="proj-status ongoing">Ongoing</span>
+      </div>
+    </div>
+    <div class="proj-headline reveal">Spatial Cell Composition<br>of Neuroblastoma</div>
+    <div class="proj-viz-wrap reveal">
+      <div class="pviz-label">// CELL ATLAS — CosMx 107K cells · 8 lineages</div>
+      <canvas class="pviz-canvas" id="pviz-01"></canvas>
+    </div>
+    <div class="proj-split">
+      <div class="reveal-l">
+        <div class="proj-overview-label">Overview</div>
+        <p class="proj-overview-text">Investigating the spatial cell composition of neuroblastoma tumours using integrated CosMx spatial transcriptomics (1k + 6k panels). Combines differential expression, trajectory analysis, and cell–cell interaction analysis to characterise the tumour microenvironment at single-cell resolution.</p>
+        <div class="proj-stats">
+          <div class="pstat"><div class="pstat-n">107K</div><div class="pstat-l">Cells Annotated</div></div>
+          <div class="pstat"><div class="pstat-n">11</div><div class="pstat-l">Leiden Clusters</div></div>
+          <div class="pstat"><div class="pstat-n pu">8</div><div class="pstat-l">Cell Lineages</div></div>
+          <div class="pstat"><div class="pstat-n">5</div><div class="pstat-l">Neuroblast Subtypes</div></div>
+        </div>
+        <div class="proj-tools">
+          <span class="ptool hl">CosMx</span><span class="ptool hl">Spatial Transcriptomics</span><span class="ptool hl">CellPhoneDB</span><span class="ptool">Python</span><span class="ptool">scRNA-seq</span><span class="ptool">Leiden Clustering</span><span class="ptool">DESeq2</span>
+        </div>
+      </div>
+      <div class="reveal-r">
+        <div class="proj-contrib-wrap">
+          <div class="pc-header">
+            <span class="pc-label">My Contributions</span>
+            <span class="pc-count">4 key outputs</span>
+          </div>
+          <div class="pc-list">
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Annotated 107,461 cells from the integrated CosMx dataset</div>
+                <div class="ci-sub">Resolved 11 Leiden clusters into 8 distinct cell lineages spanning the full tumour microenvironment — including tumour, immune, and stromal compartments</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Identified 5 neuroblast subtypes including a therapy-resistant state</div>
+                <div class="ci-sub">Characterised a NeuralCrest-like population with high therapy resistance signatures — a clinically relevant finding for treatment strategy</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Quantified T cell heterogeneity across the tumour</div>
+                <div class="ci-sub">Scored exhaustion, cytotoxicity, Treg, and proliferation signatures across T cell subpopulations to map immune dysfunction within the TME</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Established CXCL12–CXCR4 as the dominant TME communication axis</div>
+                <div class="ci-sub">Via CellPhoneDB ligand–receptor analysis — identifying this chemokine axis as the primary signalling route driving cell recruitment into the tumour</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROJECT 02 — GENO–PHENOTYPE ══ -->
+<section id="s-02" class="proj-sec">
+  <div class="proj-bg-num">02</div>
+  <div class="proj-inner">
+    <div class="proj-toprow reveal">
+      <div><div class="proj-num">02 · Deep Learning · Clinical Data</div></div>
+      <div class="proj-meta-right">
+        <span class="proj-period">Aug 2025 – Present</span>
+        <span class="proj-venue">Imperial College London · National Heart & Lung Institute</span>
+        <span class="proj-status ongoing">Ongoing · Dr. Arunashis Sau</span>
+      </div>
+    </div>
+    <div class="proj-headline reveal">Deep Learning for<br>Genotype–Phenotype<br>Prediction</div>
+    <div class="proj-viz-wrap reveal">
+      <div class="pviz-label">// ECG LEAD II — multimodal transformer input</div>
+      <canvas class="pviz-canvas" id="pviz-02"></canvas>
+    </div>
+    <div class="proj-split">
+      <div class="reveal-l">
+        <div class="proj-overview-label">Overview</div>
+        <p class="proj-overview-text">Designing transformer-based deep learning pipelines to model genotype–phenotype relationships using large-scale ECG signals and longitudinal EHR data. Data is harmonised using the MEDS schema to enable cross-cohort, multi-modal modelling — with the goal of predicting clinical phenotypes directly from genetic and physiological data.</p>
+        <div class="proj-stats">
+          <div class="pstat"><div class="pstat-n">ECG</div><div class="pstat-l">Waveform Data</div></div>
+          <div class="pstat"><div class="pstat-n pu">EHR</div><div class="pstat-l">Longitudinal</div></div>
+          <div class="pstat"><div class="pstat-n">MEDS</div><div class="pstat-l">Schema</div></div>
+        </div>
+        <div class="proj-tools">
+          <span class="ptool hl">Transformers</span><span class="ptool hl">PyTorch</span><span class="ptool hl">MEDS Schema</span><span class="ptool">ECG</span><span class="ptool">EHR</span><span class="ptool">Python</span><span class="ptool">Deep Learning</span>
+        </div>
+      </div>
+      <div class="reveal-r">
+        <div class="proj-contrib-wrap">
+          <div class="pc-header">
+            <span class="pc-label">My Contributions</span>
+            <span class="pc-count">4 key outputs</span>
+          </div>
+          <div class="pc-list">
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Designing transformer architectures for ECG-based phenotype prediction</div>
+                <div class="ci-sub">Benchmarking multiple architecture variants — evaluating tradeoffs in sequence length handling, positional encoding, and downstream phenotype classification accuracy</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Built preprocessing pipelines for longitudinal EHR harmonisation</div>
+                <div class="ci-sub">Aligned patient records to the MEDS schema, handling irregular time intervals, missing values, and cross-cohort normalisation for multi-site training</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Integrating multi-modal clinical data end-to-end</div>
+                <div class="ci-sub">Fusing ECG waveform signals with structured EHR features within a unified transformer architecture — bridging physiological and clinical data modalities</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Evaluating model robustness across heterogeneous cohorts</div>
+                <div class="ci-sub">Stress-testing trained models on out-of-distribution patient populations to assess generalisation and identify failure modes before clinical application</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROJECT 03 — MICROGLIA ══ -->
+<section id="s-03" class="proj-sec">
+  <div class="proj-bg-num">03</div>
+  <div class="proj-inner">
+    <div class="proj-toprow reveal">
+      <div><div class="proj-num">03 · scRNA-seq · Neuroscience</div></div>
+      <div class="proj-meta-right">
+        <span class="proj-period">Aug 2023 – Aug 2024</span>
+        <span class="proj-venue">NCBS-TIFR · Collaborating with Krishnaswamy Lab, Yale</span>
+        <span class="proj-status done">Completed</span>
+      </div>
+    </div>
+    <div class="proj-headline reveal">scRNA-seq Analysis of<br>Microglial Homeostasis<br>& Injury Response</div>
+    <div class="proj-viz-wrap reveal">
+      <div class="pviz-label">// PHATE MANIFOLD — homeostatic → reactive trajectory</div>
+      <canvas class="pviz-canvas" id="pviz-03"></canvas>
+    </div>
+    <div class="proj-split">
+      <div class="reveal-l">
+        <div class="proj-overview-label">Overview</div>
+        <p class="proj-overview-text">Internship at NCBS-TIFR investigating how microglia — the brain's resident immune cells — respond to stab injury and return to homeostasis. Applied single-cell RNA sequencing with trajectory inference to track transcriptional dynamics in mouse brain tissue, in collaboration with the Krishnaswamy Lab at Yale.</p>
+        <div class="proj-stats">
+          <div class="pstat"><div class="pstat-n">scRNA</div><div class="pstat-l">Full Pipeline</div></div>
+          <div class="pstat"><div class="pstat-n pu">PHATE</div><div class="pstat-l">Trajectories</div></div>
+          <div class="pstat"><div class="pstat-n gr">Yale</div><div class="pstat-l">Collaboration</div></div>
+        </div>
+        <div class="proj-tools">
+          <span class="ptool hl">Seurat</span><span class="ptool hl">PHATE</span><span class="ptool hl">R</span><span class="ptool">scRNA-seq</span><span class="ptool">Trajectory Inference</span><span class="ptool">Differential Expression</span><span class="ptool">Mouse Brain</span>
+        </div>
+      </div>
+      <div class="reveal-r">
+        <div class="proj-contrib-wrap">
+          <div class="pc-header">
+            <span class="pc-label">My Contributions</span>
+            <span class="pc-count">4 key outputs</span>
+          </div>
+          <div class="pc-list">
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Ran end-to-end scRNA-seq analysis pipeline using Seurat</div>
+                <div class="ci-sub">Executed full QC, normalisation, dimensionality reduction, graph-based clustering, and differential expression on mouse microglial single-cell data from stab injury experiments</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Applied PHATE for continuous trajectory visualisation</div>
+                <div class="ci-sub">Mapped the transcriptional continuum of microglial activation and recovery — revealing a smooth trajectory from homeostatic to reactive states post-injury</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Identified and characterised homeostatic vs reactive microglial subtypes</div>
+                <div class="ci-sub">Defined marker gene signatures for each subtype, linking transcriptional profiles to known functional states in neuroinflammation literature</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Collaborated with Krishnaswamy Lab (Yale) on trajectory methodology</div>
+                <div class="ci-sub">Worked across institutions to validate trajectory inference approaches and align analysis choices with cutting-edge manifold learning methods developed at Yale</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROJECT 04 — ISRO TELEMETRY ══ -->
+<section id="s-04" class="proj-sec">
+  <div class="proj-bg-num">04</div>
+  <div class="proj-inner">
+    <div class="proj-toprow reveal">
+      <div><div class="proj-num">04 · Deep Learning · Space Tech</div></div>
+      <div class="proj-meta-right">
+        <span class="proj-period">Nov – Dec 2023</span>
+        <span class="proj-venue">Indian Space Research Organisation (ISRO)</span>
+        <span class="proj-status done">Completed · Internship</span>
+      </div>
+    </div>
+    <div class="proj-headline reveal">Satellite Telemetry<br>Anomaly Detection<br>at ISRO</div>
+    <div class="proj-viz-wrap reveal">
+      <div class="pviz-label">// NISAR TELEMETRY — anomaly detection · 200+ channels</div>
+      <canvas class="pviz-canvas" id="pviz-04"></canvas>
+    </div>
+    <div class="proj-split">
+      <div class="reveal-l">
+        <div class="proj-overview-label">Overview</div>
+        <p class="proj-overview-text">Applied deep learning to automate anomaly detection in satellite telemetry streams at ISRO, using real operational data from the NISAR (NASA-ISRO SAR Mission) satellite. The goal: flag anomalous behaviour across 200+ telemetry channels before it becomes a mission-critical failure.</p>
+        <div class="proj-stats">
+          <div class="pstat"><div class="pstat-n">200+</div><div class="pstat-l">Telemetry Channels</div></div>
+          <div class="pstat"><div class="pstat-n pu">NISAR</div><div class="pstat-l">Real Sat Data</div></div>
+          <div class="pstat"><div class="pstat-n">LSTM</div><div class="pstat-l">+ Transformer</div></div>
+        </div>
+        <div class="proj-tools">
+          <span class="ptool hl">Deep Learning</span><span class="ptool hl">LSTM Autoencoder</span><span class="ptool hl">Python</span><span class="ptool">Transformers</span><span class="ptool">Time Series</span><span class="ptool">Anomaly Detection</span><span class="ptool">NISAR</span>
+        </div>
+      </div>
+      <div class="reveal-r">
+        <div class="proj-contrib-wrap">
+          <div class="pc-header">
+            <span class="pc-label">My Contributions</span>
+            <span class="pc-count">4 key outputs</span>
+          </div>
+          <div class="pc-list">
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Developed a deep learning model for multivariate telemetry anomaly detection</div>
+                <div class="ci-sub">Built on real NISAR satellite data — the model processes multivariate time-series across channels simultaneously to detect correlated anomalies that single-channel methods miss</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Engineered features across 200+ telemetry channels</div>
+                <div class="ci-sub">Designed cross-channel feature representations that encode temporal dependencies and inter-channel correlations — critical for detecting subtle system-level anomalies</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Benchmarked LSTM autoencoder vs Transformer architectures</div>
+                <div class="ci-sub">Systematic comparison of reconstruction-error-based anomaly scoring under both architectures, evaluating precision/recall tradeoffs for operational satellite monitoring</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Worked directly with ISRO and NASA-ISRO SAR Mission teams</div>
+                <div class="ci-sub">Collaborated with mission technical associates to validate model outputs against ground-truth anomaly records from real satellite operations</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROJECT 05 — MIGRAINE PATENT ══ -->
+<section id="s-05" class="proj-sec">
+  <div class="proj-bg-num">05</div>
+  <div class="proj-inner">
+    <div class="proj-toprow reveal">
+      <div><div class="proj-num">05 · scRNA-seq · Neurology · Patent</div></div>
+      <div class="proj-meta-right">
+        <span class="proj-period">2024 – 2025 · Capstone Project</span>
+        <span class="proj-venue">Vellore Institute of Technology · Dr. Sajitha Lulu</span>
+        <span class="proj-status patent">Patent Filed · Govt. of India</span>
+      </div>
+    </div>
+    <div class="proj-headline reveal">Migraine Pathogenesis<br>via scRNA Sequencing<br>— Patent Filed</div>
+    <div class="proj-viz-wrap reveal">
+      <div class="pviz-label">// PATHWAY NETWORK — DEG enrichment · key gene interactions</div>
+      <canvas class="pviz-canvas" id="pviz-05"></canvas>
+    </div>
+    <div class="proj-split">
+      <div class="reveal-l">
+        <div class="proj-overview-label">Overview</div>
+        <p class="proj-overview-text">Final year capstone project using single-cell RNA sequencing to investigate the molecular and cellular mechanisms underlying migraine pathogenesis. Applied ML-driven scRNA-seq analytics to map molecular interactions across relevant cell populations — resulting in a patent filed with the Government of India for the novel analytical approach.</p>
+        <div class="proj-stats">
+          <div class="pstat"><div class="pstat-n gr">Patent</div><div class="pstat-l">Govt. of India</div></div>
+          <div class="pstat"><div class="pstat-n pu">scRNA</div><div class="pstat-l">Full Pipeline</div></div>
+          <div class="pstat"><div class="pstat-n">ML</div><div class="pstat-l">Driven Analysis</div></div>
+        </div>
+        <div class="proj-tools">
+          <span class="ptool hl">scRNA-seq</span><span class="ptool hl">Machine Learning</span><span class="ptool hl">R</span><span class="ptool">Python</span><span class="ptool">Pathway Enrichment</span><span class="ptool">Differential Expression</span>
+        </div>
+        <div class="proj-outcome patent">
+          <span class="po-icon">Patent</span>
+          <p class="po-text">Filed with the Government of India (IP India) for novel ML approaches in scRNA analysis applied to neurological disorders.</p>
+        </div>
+      </div>
+      <div class="reveal-r">
+        <div class="proj-contrib-wrap">
+          <div class="pc-header">
+            <span class="pc-label">My Contributions</span>
+            <span class="pc-count">4 key outputs</span>
+          </div>
+          <div class="pc-list">
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Designed a custom ML pipeline for migraine-focused scRNA-seq analysis</div>
+                <div class="ci-sub">Tailored the processing and clustering pipeline specifically for migraine-relevant cell populations — incorporating domain knowledge to guide cell type annotation and downstream analysis</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Performed clustering and differential expression to map molecular interactions</div>
+                <div class="ci-sub">Identified transcriptionally distinct cell states and the key differentially expressed genes linking them — revealing novel molecular interaction patterns associated with migraine onset</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Integrated pathway enrichment to connect transcriptomics to migraine biology</div>
+                <div class="ci-sub">Mapped DE gene signatures onto curated biological pathways — linking transcriptional programmes in specific cell types to known and novel mechanisms in migraine pathophysiology</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Filed a patent with the Government of India for the analytical approach</div>
+                <div class="ci-sub">Developed the IP application covering the novel combination of ML methods and scRNA-seq framework for studying neurological disorders at the molecular level</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROJECT 06 — SPACE CARGO ══ -->
+<section id="s-06" class="proj-sec">
+  <div class="proj-bg-num">06</div>
+  <div class="proj-inner">
+    <div class="proj-toprow reveal">
+      <div><div class="proj-num">06 · AI · Space Technology · Hackathon</div></div>
+      <div class="proj-meta-right">
+        <span class="proj-period">2025 · National Space Hackathon</span>
+        <span class="proj-venue">IIT Delhi & ISRO</span>
+        <span class="proj-status award">Top 10 National Finalist</span>
+      </div>
+    </div>
+    <div class="proj-headline reveal">AI Smart Space<br>Cargo Management<br>System</div>
+    <div class="proj-viz-wrap reveal">
+      <div class="pviz-label">// CARGO BAY — optimal placement · constraint satisfaction</div>
+      <canvas class="pviz-canvas" id="pviz-06"></canvas>
+    </div>
+    <div class="proj-split">
+      <div class="reveal-l">
+        <div class="proj-overview-label">Overview</div>
+        <p class="proj-overview-text">Designed and prototyped an AI-driven Smart Space Cargo Management System at the National Space Hackathon, competing against hundreds of teams. The system intelligently manages cargo placement and retrieval in microgravity environments — reaching the national top 10 and being evaluated by ISRO and IIT Delhi judges.</p>
+        <div class="proj-stats">
+          <div class="pstat"><div class="pstat-n gr">Top 10</div><div class="pstat-l">National Rank</div></div>
+          <div class="pstat"><div class="pstat-n pu">AI</div><div class="pstat-l">Core System</div></div>
+          <div class="pstat"><div class="pstat-n">ISRO</div><div class="pstat-l">Evaluated By</div></div>
+        </div>
+        <div class="proj-tools">
+          <span class="ptool hl">AI</span><span class="ptool hl">Computer Vision</span><span class="ptool hl">Python</span><span class="ptool">Optimisation</span><span class="ptool">Space Tech</span><span class="ptool">Constraint Satisfaction</span>
+        </div>
+        <div class="proj-outcome">
+          <span class="po-icon">Award</span>
+          <p class="po-text">Top 10 National Finalist — selected from hundreds of teams and presented to a panel of ISRO and IIT Delhi judges.</p>
+        </div>
+      </div>
+      <div class="reveal-r">
+        <div class="proj-contrib-wrap">
+          <div class="pc-header">
+            <span class="pc-label">My Contributions</span>
+            <span class="pc-count">4 key outputs</span>
+          </div>
+          <div class="pc-list">
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Designed the core AI architecture for intelligent cargo management</div>
+                <div class="ci-sub">Built the AI decision layer that maps cargo items to optimal placement positions — balancing weight distribution, accessibility, and mission-phase priorities in a microgravity context</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Proposed computer-vision based item identification and tracking</div>
+                <div class="ci-sub">Designed an onboard camera-driven CV pipeline to recognise, track, and catalogue cargo items in real-time — enabling autonomous inventory management without manual cataloguing</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Modelled microgravity cargo dynamics with constraint satisfaction</div>
+                <div class="ci-sub">Formulated a constraint-satisfaction packing algorithm that accounts for microgravity physics — ensuring stable placement and predictable retrieval across changing cargo loads</div>
+              </div>
+            </div>
+            <div class="ci">
+              <div class="ci-mark">&gt;</div>
+              <div class="ci-body">
+                <div class="ci-head">Presented to ISRO and IIT Delhi judges — ranked national top 10</div>
+                <div class="ci-sub">Delivered the full technical presentation and Q&A to an expert panel — securing a top 10 national ranking from a highly competitive field across India's top technical institutions</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>© 2026 <strong style="color:var(--ink)">Nidhi Shakhapur</strong> · Imperial College London · Research Projects</p>
+  <p><a href="index.html">← Back to Portfolio</a> · <a href="mailto:nshakhapur@gmail.com">nshakhapur@gmail.com</a></p>
+</footer>
+
+<script>
+// ── THREE.JS NEURAL BRAIN ──
+(function(){
+  var canvas=document.getElementById('bg');
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth,window.innerHeight);
+  renderer.setClearColor(0x02020a,1);
+  var scene=new THREE.Scene();scene.fog=new THREE.Fog(0x02020a,22,65);
+  var camera=new THREE.PerspectiveCamera(58,window.innerWidth/window.innerHeight,0.1,100);
+  camera.position.set(0,0,12);
+  var camTarget=new THREE.Vector3(0,0,0);
+  scene.add(new THREE.AmbientLight(0x060618,3));
+  var blueL=new THREE.PointLight(0x22d3ee,4,28);blueL.position.set(-3,3,5);scene.add(blueL);
+  var purL=new THREE.PointLight(0xa855f7,3,28);purL.position.set(4,-2,4);scene.add(purL);
+  (function(){
+    var n=5000,pos=new Float32Array(n*3);
+    for(var i=0;i<n*3;i++)pos[i]=(Math.random()-.5)*90;
+    var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+    scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0x1a3050,size:0.025,transparent:true,opacity:.65})));
+  })();
+  var brainGroup=new THREE.Group();scene.add(brainGroup);
+  var N=380,nodes=[],phi_g=Math.PI*(3-Math.sqrt(5));
+  for(var i=0;i<N;i++){
+    var y=1-(i/(N-1))*2,rr=Math.sqrt(1-y*y),t=phi_g*i,R=2.5;
+    nodes.push(new THREE.Vector3(R*rr*Math.cos(t),R*y,R*rr*Math.sin(t)));
+  }
+  var npa=new Float32Array(N*3),nca=new Float32Array(N*3);
+  nodes.forEach(function(v,i){
+    npa[i*3]=v.x;npa[i*3+1]=v.y;npa[i*3+2]=v.z;
+    var b=Math.random();nca[i*3]=.13+b*.08;nca[i*3+1]=.83-b*.08;nca[i*3+2]=.93;
+  });
+  var ng=new THREE.BufferGeometry();
+  ng.setAttribute('position',new THREE.Float32BufferAttribute(npa,3));
+  ng.setAttribute('color',new THREE.Float32BufferAttribute(nca,3));
+  brainGroup.add(new THREE.Points(ng,new THREE.PointsMaterial({size:.065,vertexColors:true,transparent:true,opacity:.92})));
+  var cp=[];
+  for(var i=0;i<N;i++)for(var j=i+1;j<N;j++)if(nodes[i].distanceTo(nodes[j])<1.28){cp.push(nodes[i].x,nodes[i].y,nodes[i].z,nodes[j].x,nodes[j].y,nodes[j].z);}
+  var cg2=new THREE.BufferGeometry();cg2.setAttribute('position',new THREE.Float32BufferAttribute(cp,3));
+  brainGroup.add(new THREE.LineSegments(cg2,new THREE.LineBasicMaterial({color:0x22d3ee,transparent:true,opacity:.16})));
+  [[0,0,0],[Math.PI/2.2,0,Math.PI/4],[0,Math.PI/3,Math.PI/2]].forEach(function(rot,i){
+    var rg=new THREE.TorusGeometry(2.82+i*.26,.011,8,120);
+    var rm=new THREE.MeshBasicMaterial({color:[0x22d3ee,0xa855f7,0x00bfff][i],transparent:true,opacity:.42});
+    var ring=new THREE.Mesh(rg,rm);ring.rotation.set(rot[0],rot[1],rot[2]);
+    ring.userData.axis=new THREE.Vector3(...[[0,1,0],[1,0,.3],[.5,0,1]][i]).normalize();
+    ring.userData.speed=[.004,.003,.005][i];brainGroup.add(ring);
+  });
+  var SC=20,sigs=[],segN=cp.length/6;
+  for(var i=0;i<SC;i++){
+    var s=Math.floor(Math.random()*segN);
+    sigs.push({a:new THREE.Vector3(cp[s*6],cp[s*6+1],cp[s*6+2]),b:new THREE.Vector3(cp[s*6+3],cp[s*6+4],cp[s*6+5]),t:Math.random(),spd:.009+Math.random()*.014});
+  }
+  var spa=new Float32Array(SC*3),sgg=new THREE.BufferGeometry();
+  sgg.setAttribute('position',new THREE.Float32BufferAttribute(spa,3));
+  brainGroup.add(new THREE.Points(sgg,new THREE.PointsMaterial({color:0xffffff,size:.1,transparent:true,opacity:.88})));
+  var TC=200,tp=new Float32Array(TC*3),tc=new Float32Array(TC*3),tv=[];
+  for(var i=0;i<TC;i++){
+    tp[i*3]=(Math.random()-.5)*24;tp[i*3+1]=(Math.random()-.5)*8-1.5;tp[i*3+2]=(Math.random()-.5)*12;
+    var tt=Math.random();tc[i*3]=.13+tt*.52;tc[i*3+1]=.83-tt*.5;tc[i*3+2]=.93;
+    tv.push({x:.012+Math.random()*.016,y:(Math.random()-.5)*.003});
+  }
+  var tgg=new THREE.BufferGeometry();
+  tgg.setAttribute('position',new THREE.Float32BufferAttribute(tp,3));
+  tgg.setAttribute('color',new THREE.Float32BufferAttribute(tc,3));
+  scene.add(new THREE.Points(tgg,new THREE.PointsMaterial({size:.065,vertexColors:true,transparent:true,opacity:.75})));
+  var clock=new THREE.Clock();
+  (function animate(){
+    requestAnimationFrame(animate);
+    var t=clock.getElapsedTime();
+    brainGroup.rotation.y+=.002;brainGroup.rotation.x=Math.sin(t*.12)*.04;
+    brainGroup.children.forEach(function(c){if(c.userData.speed)c.rotateOnAxis(c.userData.axis,c.userData.speed);});
+    var sp=sgg.attributes.position;
+    sigs.forEach(function(s,i){
+      s.t+=s.spd;
+      if(s.t>1){s.t=0;var seg=Math.floor(Math.random()*segN);s.a.set(cp[seg*6],cp[seg*6+1],cp[seg*6+2]);s.b.set(cp[seg*6+3],cp[seg*6+4],cp[seg*6+5]);}
+      var p=s.a.clone().lerp(s.b,s.t);sp.array[i*3]=p.x;sp.array[i*3+1]=p.y;sp.array[i*3+2]=p.z;
+    });
+    sp.needsUpdate=true;
+    var pp=tgg.attributes.position;
+    for(var i=0;i<TC;i++){pp.array[i*3]+=tv[i].x;pp.array[i*3+1]+=tv[i].y;if(pp.array[i*3]>12)pp.array[i*3]=-12;}
+    pp.needsUpdate=true;
+    blueL.position.x=Math.sin(t*.38)*5;blueL.position.z=Math.cos(t*.38)*5;
+    camera.lookAt(camTarget);renderer.render(scene,camera);
+  })();
+
+  // GSAP scroll camera — 7 states (hero + 6 projects)
+  gsap.registerPlugin(ScrollTrigger);
+  var camStates=[
+    {pos:{x:0,y:0,z:12},tgt:{x:0,y:0,z:0}},
+    {pos:{x:-4,y:2,z:9},tgt:{x:-1,y:1,z:0}},
+    {pos:{x:3,y:-1,z:10},tgt:{x:1,y:0,z:0}},
+    {pos:{x:-2,y:-2,z:10},tgt:{x:-1,y:-1,z:0}},
+    {pos:{x:4,y:1,z:9},tgt:{x:2,y:0,z:0}},
+    {pos:{x:-3,y:2,z:11},tgt:{x:-1,y:1,z:0}},
+    {pos:{x:0,y:-1,z:13},tgt:{x:0,y:0,z:0}},
+  ];
+  ['#s-hero','#s-01','#s-02','#s-03','#s-04','#s-05','#s-06'].forEach(function(sel,i){
+    ScrollTrigger.create({
+      trigger:sel,start:'top 55%',
+      onEnter:function(){gsap.to(camera.position,Object.assign({},camStates[i].pos,{duration:1.8,ease:'power2.inOut'}));gsap.to(camTarget,Object.assign({},camStates[i].tgt,{duration:1.8,ease:'power2.inOut'}));},
+      onLeaveBack:i>0?function(){var p=camStates[i-1];gsap.to(camera.position,Object.assign({},p.pos,{duration:1.8,ease:'power2.inOut'}));gsap.to(camTarget,Object.assign({},p.tgt,{duration:1.8,ease:'power2.inOut'}));}:null,
+    });
+  });
+  window.addEventListener('resize',function(){camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+})();
+
+// ── Scroll reveal ──
+var revObs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');revObs.unobserve(e.target);}});
+},{threshold:.06});
+document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(function(el){revObs.observe(el);});
+
+// ── Side dot nav ──
+var sideDots=document.querySelectorAll('.sn-dot');
+var sections=['s-hero','s-01','s-02','s-03','s-04','s-05','s-06'];
+function updateNav(){
+  document.getElementById('topbar').classList.toggle('scrolled',window.scrollY>30);
+  var cur='s-hero';
+  sections.forEach(function(id){var el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-160)cur=id;});
+  sideDots.forEach(function(dot){dot.classList.toggle('active',dot.getAttribute('href')==='#'+cur);});
+}
+window.addEventListener('scroll',updateNav,{passive:true});
+updateNav();
+
+// ── Cursor glow ──
+var cgEl=document.getElementById('cg');
+document.addEventListener('mousemove',function(e){cgEl.style.left=e.clientX+'px';cgEl.style.top=e.clientY+'px';});
+
+// ── Mini Data Visualizations ──
+(function(){
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  function setupCanvas(cv){
+    var W=cv.parentElement.offsetWidth,H=cv.parentElement.offsetHeight;
+    cv.width=W*dpr;cv.height=H*dpr;
+    cv.style.width=W+'px';cv.style.height=H+'px';
+    var ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+    return{ctx:ctx,W:W,H:H};
+  }
+
+  // ── VIZ 01: UMAP scatter (Neuroblastoma cell atlas) ──
+  function drawUMAP(cv){
+    var r=setupCanvas(cv),ctx=r.ctx,W=r.W,H=r.H;
+    var clusters=[
+      {lbl:'Tumour',cx:.17,cy:.44,n:62,sr:20,c:'34,211,238'},
+      {lbl:'NeuralCrest',cx:.32,cy:.27,n:40,sr:15,c:'103,232,249'},
+      {lbl:'T-cell',cx:.55,cy:.22,n:46,sr:16,c:'168,85,247'},
+      {lbl:'Macrophage',cx:.72,cy:.52,n:36,sr:14,c:'192,132,252'},
+      {lbl:'NK cell',cx:.64,cy:.72,n:28,sr:12,c:'45,212,191'},
+      {lbl:'Stromal',cx:.43,cy:.74,n:38,sr:14,c:'200,200,220'},
+      {lbl:'Endo',cx:.24,cy:.74,n:24,sr:11,c:'244,114,182'},
+      {lbl:'B-cell',cx:.83,cy:.38,n:20,sr:10,c:'129,140,248'},
+    ];
+    var rng=(function(){var s=31337;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967295;}})();
+    var dots=[];
+    clusters.forEach(function(cl){
+      for(var i=0;i<cl.n;i++){
+        var ang=rng()*Math.PI*2,rad=Math.sqrt(rng())*cl.sr;
+        dots.push({x:cl.cx*W+Math.cos(ang)*rad,y:cl.cy*H+Math.sin(ang)*rad,c:cl.c,a:0,ta:.7+rng()*.3});
+      }
+    });
+    dots.sort(function(){return rng()-.5;});
+    var t0=performance.now(),dur=1600;
+    function frame(){
+      var p=Math.min((performance.now()-t0)/dur,1);
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle='rgba(34,211,238,.12)';ctx.font='9px "Share Tech Mono"';
+      ctx.fillText('UMAP1',W/2-18,H-6);
+      ctx.save();ctx.translate(11,H/2+20);ctx.rotate(-Math.PI/2);ctx.fillText('UMAP2',-18,0);ctx.restore();
+      ctx.strokeStyle='rgba(34,211,238,.05)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(W/2,H);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(0,H/2);ctx.lineTo(W,H/2);ctx.stroke();
+      for(var i=0;i<dots.length;i++){
+        var d=dots[i],dp=Math.max(0,Math.min(1,(p-(i/dots.length)*.55)/.45));
+        d.a=dp*d.ta;
+        if(!d.a)continue;
+        ctx.beginPath();ctx.arc(d.x,d.y,1.5,0,Math.PI*2);
+        ctx.fillStyle='rgba('+d.c+','+d.a+')';ctx.fill();
+      }
+      clusters.forEach(function(cl){
+        var a=Math.max(0,Math.min(.6,p*2-.6));
+        ctx.fillStyle='rgba('+cl.c+','+a+')';ctx.font='9px "Share Tech Mono"';
+        ctx.fillText(cl.lbl,cl.cx*W+cl.sr+4,cl.cy*H+3);
+      });
+      if(p<1)requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ── VIZ 02: Live scrolling ECG (ECG/EHR project) ──
+  function startECG(cv){
+    var r=setupCanvas(cv),ctx=r.ctx,W=r.W,H=r.H;
+    var midY=H/2+8,amp=H*.36,phase=0,BPS=.013;
+    var buf=new Float32Array(W);
+    function hb(t){
+      t=((t%1)+1)%1;
+      if(t<.08)return 0;
+      if(t<.13)return .09*Math.sin((t-.08)/.05*Math.PI);
+      if(t<.22)return 0;
+      if(t<.265)return-.14;
+      if(t<.305)return 1;
+      if(t<.35)return-.32;
+      if(t<.4)return 0;
+      if(t<.55)return .21*Math.sin((t-.4)/.15*Math.PI);
+      return 0;
+    }
+    function frame(){
+      phase+=BPS;buf.copyWithin(0,1);buf[W-1]=hb(phase);
+      ctx.clearRect(0,0,W,H);
+      ctx.strokeStyle='rgba(34,211,238,.06)';ctx.lineWidth=1;
+      for(var x=0;x<W;x+=48){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+      for(var y=0;y<H;y+=H/4){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+      ctx.fillStyle='rgba(34,211,238,.26)';ctx.font='9px "Share Tech Mono"';
+      ctx.fillText('LEAD II',14,20);ctx.fillText('25 mm/s  · 10 mm/mV',W-130,20);
+      ctx.beginPath();ctx.strokeStyle='#22d3ee';ctx.lineWidth=1.8;
+      ctx.shadowColor='rgba(34,211,238,.45)';ctx.shadowBlur=6;
+      for(var i=0;i<W;i++){var py=midY-buf[i]*amp;if(!i)ctx.moveTo(i,py);else ctx.lineTo(i,py);}
+      ctx.stroke();ctx.shadowBlur=0;
+      var lv=buf[W-1];
+      ctx.beginPath();ctx.arc(W-1,midY-lv*amp,3.5,0,Math.PI*2);
+      ctx.fillStyle='#22d3ee';ctx.fill();
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ── VIZ 03: PHATE trajectory arc (Microglia) ──
+  function drawPHATE(cv){
+    var r=setupCanvas(cv),ctx=r.ctx,W=r.W,H=r.H;
+    var rng=(function(){var s=54321;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967295;}})();
+    var pathPts=[];var steps=80;
+    for(var i=0;i<=steps;i++){
+      var t=i/steps,x=.08*W+t*.84*W,y=H*.5+Math.sin(t*Math.PI)*(H*-.26)+Math.sin(t*Math.PI*3)*(H*.04);
+      pathPts.push({x:x,y:y});
+    }
+    var scattered=[];
+    pathPts.forEach(function(p,i){
+      var n=Math.floor(3+rng()*5);
+      for(var j=0;j<n;j++){
+        var spread=18+Math.sin(i/steps*Math.PI)*12;
+        scattered.push({x:p.x+(rng()-.5)*spread,y:p.y+(rng()-.5)*spread,t:i/steps,a:0});
+      }
+    });
+    var t0=performance.now(),dur=1800;
+    function frame(){
+      var p=Math.min((performance.now()-t0)/dur,1);
+      ctx.clearRect(0,0,W,H);
+      var drawTo=Math.floor(p*steps);
+      if(drawTo>1){
+        for(var i=0;i<drawTo-1;i++){
+          var tf=i/steps,nf=(i+1)/steps;
+          var g=ctx.createLinearGradient(pathPts[i].x,pathPts[i].y,pathPts[i+1].x,pathPts[i+1].y);
+          g.addColorStop(0,'rgba('+lerp3('168,85,247','34,211,238',tf)+','+(p>.5?.7:.4)+')');
+          g.addColorStop(1,'rgba('+lerp3('168,85,247','34,211,238',nf)+','+(p>.5?.7:.4)+')');
+          ctx.beginPath();ctx.moveTo(pathPts[i].x,pathPts[i].y);ctx.lineTo(pathPts[i+1].x,pathPts[i+1].y);
+          ctx.strokeStyle=g;ctx.lineWidth=2.2;ctx.stroke();
+        }
+      }
+      scattered.forEach(function(d){
+        if(d.t<p){d.a=Math.min(d.a+.04,1);}
+        if(!d.a)return;
+        var col=lerp3('168,85,247','34,211,238',d.t);
+        ctx.beginPath();ctx.arc(d.x,d.y,1.4,0,Math.PI*2);
+        ctx.fillStyle='rgba('+col+','+d.a*.65+')';ctx.fill();
+      });
+      ctx.fillStyle='rgba(168,85,247,.55)';ctx.font='9px "Share Tech Mono"';ctx.fillText('homeostatic',8,H*.5-28);
+      ctx.fillStyle='rgba(34,211,238,.55)';ctx.font='9px "Share Tech Mono"';ctx.fillText('reactive',W*.9,H*.5-28);
+      ctx.fillStyle='rgba(255,255,255,.12)';ctx.font='9px "Share Tech Mono"';ctx.fillText('injury →',W*.48,H*.18);
+      if(p<1)requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+  function lerp3(a,b,t){
+    var av=a.split(',').map(Number),bv=b.split(',').map(Number);
+    return av.map(function(v,i){return Math.round(v+(bv[i]-v)*t);}).join(',');
+  }
+
+  // ── VIZ 04: Telemetry anomaly detection (ISRO) ──
+  function drawTelemetry(cv){
+    var r=setupCanvas(cv),ctx=r.ctx,W=r.W,H=r.H;
+    var rng=(function(){var s=99887;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967295;}})();
+    var channels=[
+      {label:'CH_04 · POWER',y:.25,col:'34,211,238',freq:.031,amp:.09,offset:0},
+      {label:'CH_12 · THERMAL',y:.52,col:'168,85,247',freq:.018,amp:.07,offset:2.1},
+      {label:'CH_31 · ATTITUDE',y:.79,col:'45,212,191',freq:.025,amp:.08,offset:4.3},
+    ];
+    var ANOMX=W*.6,ANOMW=W*.12;
+    var noise=[];
+    for(var i=0;i<W;i++){noise.push((rng()-.5)*.022);}
+    var t0=performance.now(),dur=1000,scanX=-1,scanDir=1,scanSpd=.8,started=false;
+    function frame(){
+      var age=performance.now()-t0,fadein=Math.min(age/dur,1);
+      ctx.clearRect(0,0,W,H);
+      if(fadein>.3){
+        var ra=Math.min((fadein-.3)/.7,1);
+        ctx.fillStyle='rgba(245,158,11,'+(.06*ra)+')';
+        ctx.fillRect(ANOMX,0,ANOMW,H);
+        ctx.strokeStyle='rgba(245,158,11,'+(.28*ra)+')';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+        ctx.beginPath();ctx.moveTo(ANOMX,0);ctx.lineTo(ANOMX,H);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(ANOMX+ANOMW,0);ctx.lineTo(ANOMX+ANOMW,H);ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle='rgba(245,158,11,'+(.5*ra)+')';ctx.font='bold 9px "Share Tech Mono"';
+        ctx.fillText('ANOMALY',ANOMX+4,14);
+      }
+      channels.forEach(function(ch,ci){
+        var baseY=ch.y*H;
+        ctx.beginPath();ctx.strokeStyle='rgba('+ch.col+','+(.55*fadein)+')';ctx.lineWidth=1.4;
+        ctx.shadowColor='rgba('+ch.col+',.35)';ctx.shadowBlur=3;
+        for(var x=0;x<W;x++){
+          var v=Math.sin(x*ch.freq+ch.offset)*ch.amp+noise[x]*.6;
+          if(x>ANOMX&&x<ANOMX+ANOMW&&ci===2)v+=Math.sin((x-ANOMX)/(ANOMW)*Math.PI)*.38;
+          var py=baseY-v*H*.5;
+          if(!x)ctx.moveTo(x,py);else ctx.lineTo(x,py);
+        }
+        ctx.stroke();ctx.shadowBlur=0;
+        ctx.fillStyle='rgba('+ch.col+','+(.38*fadein)+')';ctx.font='8px "Share Tech Mono"';
+        ctx.fillText(ch.label,8,baseY-H*.06-.5);
+      });
+      if(fadein>=1){
+        if(!started){started=true;scanX=0;}
+        scanX+=scanSpd;
+        if(scanX>W){scanX=0;}
+        ctx.strokeStyle='rgba(34,211,238,.22)';ctx.lineWidth=1;
+        ctx.beginPath();ctx.moveTo(scanX,0);ctx.lineTo(scanX,H);ctx.stroke();
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ── VIZ 05: Pathway network (Migraine patent) ──
+  function drawPathway(cv){
+    var r=setupCanvas(cv),ctx=r.ctx,W=r.W,H=r.H;
+    var nodes=[
+      {lbl:'CGRP',x:.14,y:.42,key:true},{lbl:'TRPV1',x:.26,y:.22,key:true},
+      {lbl:'5-HT1B',x:.38,y:.62,key:true},{lbl:'NF-κB',x:.52,y:.34,key:true},
+      {lbl:'IL-6',x:.64,y:.58,key:false},{lbl:'TNF-α',x:.66,y:.24,key:false},
+      {lbl:'CXCL1',x:.78,y:.44,key:false},{lbl:'Nav1.7',x:.22,y:.72,key:false},
+      {lbl:'COX-2',x:.44,y:.78,key:false},{lbl:'PIEZO2',x:.86,y:.65,key:false},
+      {lbl:'TRPA1',x:.12,y:.68,key:false},{lbl:'SP',x:.56,y:.72,key:false},
+    ];
+    var edges=[[0,1],[0,3],[1,3],[2,3],[2,8],[3,4],[3,5],[4,6],[5,6],[0,7],[2,7],[3,11],[8,11],[6,9],[4,5],[10,0],[10,2]];
+    var t0=performance.now(),edgeDur=1200,nodeDur=1600;
+    function frame(){
+      var age=performance.now()-t0,pulse=Math.sin(age*.003)*.5+.5;
+      ctx.clearRect(0,0,W,H);
+      edges.forEach(function(e,i){
+        var n0=nodes[e[0]],n1=nodes[e[1]];
+        var ep=Math.max(0,Math.min(1,(age-i*40)/edgeDur));
+        if(!ep)return;
+        ctx.beginPath();ctx.moveTo(n0.x*W,n0.y*H);ctx.lineTo(n1.x*W,n1.y*H);
+        ctx.strokeStyle='rgba(168,85,247,'+(.18*ep)+')';ctx.lineWidth=1;ctx.stroke();
+      });
+      nodes.forEach(function(n,i){
+        var np=Math.max(0,Math.min(1,(age-i*60)/nodeDur));
+        if(!np)return;
+        var x=n.x*W,y=n.y*H;
+        var baseR=n.key?6:4,glowR=n.key?baseR+pulse*3:baseR;
+        if(n.key){
+          ctx.beginPath();ctx.arc(x,y,glowR+4,0,Math.PI*2);
+          ctx.fillStyle='rgba(34,211,238,'+(.06*np*pulse)+')';ctx.fill();
+        }
+        ctx.beginPath();ctx.arc(x,y,glowR,0,Math.PI*2);
+        var col=n.key?'34,211,238':'168,85,247';
+        ctx.fillStyle='rgba('+col+','+(.85*np)+')';ctx.fill();
+        ctx.strokeStyle='rgba('+col+','+(.4*np)+')';ctx.lineWidth=1;ctx.stroke();
+        ctx.fillStyle='rgba(255,255,255,'+(.52*np)+')';ctx.font='8.5px "Share Tech Mono"';
+        ctx.fillText(n.lbl,x+glowR+3,y+3);
+      });
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ── VIZ 06: Cargo bay grid (Space Cargo) ──
+  function drawCargo(cv){
+    var r=setupCanvas(cv),ctx=r.ctx,W=r.W,H=r.H;
+    var COLS=14,ROWS=4,PAD=2;
+    var cw=(W-PAD*(COLS+1))/COLS,ch=(H-PAD*(ROWS+1))/ROWS;
+    var types=[
+      {c:'34,211,238',lbl:'LIFE'},{c:'168,85,247',lbl:'EQUIP'},{c:'45,212,191',lbl:'FUEL'},
+      {c:'244,114,182',lbl:'FOOD'},{c:'245,158,11',lbl:'WASTE'},{c:null,lbl:''},
+    ];
+    var rng=(function(){var s=13579;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967295;}})();
+    var grid=[];
+    for(var row=0;row<ROWS;row++){
+      grid[row]=[];
+      for(var col=0;col<COLS;col++){
+        var tr=Math.floor(rng()*6);
+        grid[row][col]={t:types[tr],a:0,optimal:tr<3&&rng()>.5};
+      }
+    }
+    var scanX=0,scanSpd=1.4,t0=performance.now(),fadeDur=900;
+    function frame(){
+      var age=performance.now()-t0,fp=Math.min(age/fadeDur,1);
+      ctx.clearRect(0,0,W,H);
+      ctx.strokeStyle='rgba(34,211,238,.08)';ctx.lineWidth=1;
+      for(var row=0;row<ROWS;row++){
+        for(var col=0;col<COLS;col++){
+          var cell=grid[row][col];
+          var x=PAD+(cw+PAD)*col,y=PAD+(ch+PAD)*row;
+          if(cell.t.c){
+            cell.a=Math.min(cell.a+.03*fp,.78);
+            ctx.fillStyle='rgba('+cell.t.c+','+cell.a+')';ctx.fillRect(x,y,cw,ch);
+            if(cell.optimal&&fp>.6){
+              ctx.strokeStyle='rgba(34,211,238,.6)';ctx.lineWidth=1.5;
+              ctx.strokeRect(x+.75,y+.75,cw-1.5,ch-1.5);
+            }
+          } else {
+            ctx.fillStyle='rgba(10,14,30,'+(.6*fp)+')';ctx.fillRect(x,y,cw,ch);
+            ctx.strokeStyle='rgba(34,211,238,.06)';ctx.lineWidth=.5;ctx.strokeRect(x,y,cw,ch);
+          }
+          if(x<scanX&&scanX<x+cw){
+            ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(x,y,cw,ch);
+          }
+        }
+      }
+      if(fp>=1){
+        scanX+=scanSpd;if(scanX>W+cw)scanX=0;
+        ctx.fillStyle='rgba(34,211,238,.2)';ctx.fillStyle='rgba(34,211,238,.18)';
+        ctx.fillRect(Math.max(0,scanX-2),0,2,H);
+      }
+      var lgx=W-130,lgy=H-14;
+      types.slice(0,5).forEach(function(tp,i){
+        ctx.fillStyle='rgba('+tp.c+','+(fp*.7)+')';
+        ctx.fillRect(lgx+i*22,lgy,10,6);
+        ctx.fillStyle='rgba(255,255,255,'+(fp*.28)+')';
+        ctx.font='7.5px "Share Tech Mono"';ctx.fillText(tp.lbl,lgx+i*22,lgy-3);
+      });
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // ── Intersection trigger ──
+  var vizMap={'pviz-01':drawUMAP,'pviz-02':startECG,'pviz-03':drawPHATE,'pviz-04':drawTelemetry,'pviz-05':drawPathway,'pviz-06':drawCargo};
+  var vizObs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('in');
+        var fn=vizMap[e.target.id];
+        if(fn)fn(e.target);
+        vizObs.unobserve(e.target);
+      }
+    });
+  },{threshold:.25});
+  document.querySelectorAll('.pviz-canvas').forEach(function(c){vizObs.observe(c);});
+})();
+
+// ── Loader ──
+var msgs=['LOADING SEQUENCE DATA...','PARSING PROJECT RECORDS...','MAPPING CONTRIBUTIONS...','CALIBRATING TIMELINES...','READY'];
+var si=0,ldFill=document.getElementById('ld-fill'),ldStatus=document.getElementById('ld-status');
+var ldInt=setInterval(function(){
+  si++;ldFill.style.width=(si/msgs.length*100)+'%';ldStatus.textContent=msgs[Math.min(si,msgs.length-1)];
+  if(si>=msgs.length){clearInterval(ldInt);setTimeout(function(){gsap.to('#loader',{opacity:0,duration:.55,onComplete:function(){document.getElementById('loader').style.display='none';}});},450);}
+},400);
+</script>
+</body>
+</html>
